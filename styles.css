@@ -1,0 +1,218 @@
+:root {
+    --primary-color: #19bca1;
+    --primary-light: #03d4b0;
+    --accent-color: #FF5722;
+    --text-primary: #212121;
+    --text-secondary: #757575;
+    --divider-color: #BDBDBD;
+    --background-color: #f5f5f5;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    width: 300px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    padding: 16px;
+    background-color: white;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.next-event {
+    text-align: center;
+    padding: 20px 0;
+    border-bottom: 1px solid var(--divider-color);
+}
+
+.next-event-name {
+    font-size: 16px;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+}
+
+.next-event-countdown {
+    font-size: 24px;
+    color: var(--primary-color);
+    font-weight: bold;
+}
+
+.add-event-section {
+    text-align: center;
+}
+
+.add-event-btn {
+    padding: 8px 24px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.2s;
+}
+
+.add-event-btn:hover {
+    background-color: var(--primary-light);
+}
+
+.add-event-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px;
+    background-color: var(--background-color);
+    border-radius: 8px;
+}
+
+.add-event-form.hidden {
+    display: none;
+}
+
+input {
+    padding: 8px;
+    border: 1px solid var(--divider-color);
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+.form-buttons {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+.cancel-btn {
+    padding: 6px 12px;
+    background-color: var(--background-color);
+    color: var(--text-secondary);
+    border: 1px solid var(--divider-color);
+    border-radius: 4px;
+    cursor: pointer;
+}
+.cancel-btn:hover {
+    background-color: #e0e5ff;
+}
+
+.confirm-btn {
+    padding: 6px 12px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.confirm-btn:hover {
+    background-color: var(--primary-light);
+}
+
+.events-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.events-list #eventsList .event-item:last-of-type {
+    margin-bottom: 0;
+}
+
+.event-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    padding-right: 3px;
+    background-color: var(--background-color);
+    border-radius: 4px;
+    margin-bottom: 5px;
+}
+
+.event-name {
+    font-weight: 500;
+    flex: 1;
+    color: var(--text-primary);
+}
+
+.event-countdown {
+    color: var(--text-secondary);
+    font-size: 14px;
+    flex: 1;
+}
+
+.event-btn {
+    width: 70px;
+    text-align: right;
+}
+
+.delete-btn {
+    color: var(--accent-color);
+    cursor: pointer;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 18px;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+    padding-right: 2px;
+    padding-left: 0;
+    margin-left: 3px;
+    background: transparent;
+}
+
+.delete-btn:hover {
+    opacity: 1;
+}
+
+.toggle-btn {
+    padding: 4px 8px;
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+}
+
+.toggle-btn:hover {
+    opacity: 1;
+}
+
+.flatpickr-calendar.animate.open {
+    margin-right: 10px;
+    left: 0;
+    width: calc(100% - 20px);
+}
+
+/* 滚动条样式 */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--background-color);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--divider-color);
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--text-secondary);
+}

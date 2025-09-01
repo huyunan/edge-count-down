@@ -1,0 +1,7 @@
+# Extension specific
+*.crx
+*.pem
+*.zip
+
+# OS specific
+.DS_Store

@@ -1,0 +1,46 @@
+{
+  "extensionName": {
+    "message": "Event Countdown Regularly Remind",
+    "description": "Extension name"
+  },
+  "extensionDescription": {
+    "message": "Displays countdown days for upcoming events, helping you track important dates. Supports adding and deleting events with reminder notifications.",
+    "description": "Extension description"
+  },
+  "addNewEvent": {
+    "message": "Add New Event",
+    "description": "Add new event button text"
+  },
+  "eventName": {
+    "message": "Event Name",
+    "description": "Event name input label"
+  },
+  "eventTime": {
+    "message": "Event Date",
+    "description": "Event date input label"
+  },
+  "daysLeft": {
+    "message": "Days Left",
+    "description": "Days left label"
+  },
+  "deleteEvent": {
+    "message": "Delete Event",
+    "description": "Delete event button text"
+  },
+  "notificationTitle": {
+    "message": "Event Countdown Reminder",
+    "description": "Notification title"
+  },
+  "notificationMessage": {
+    "message": "$EVENT_NAME$ is coming in $DAYS$ days",
+    "description": "Notification message",
+    "placeholders": {
+      "event_name": {
+        "content": "$1"
+      },
+      "days": {
+        "content": "$2"
+      }
+    }
+  }
+} 

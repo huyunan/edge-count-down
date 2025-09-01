@@ -1,0 +1,52 @@
+{
+  "extensionName": {
+    "message": "事件倒计时提醒",
+    "description": "扩展名称"
+  },
+  "extensionDescription": {
+    "message": "显示最近事件的倒计时天数，帮助您追踪重要事件的时间。支持添加、删除事件，并提供倒计时提醒功能。",
+    "description": "扩展描述"
+  },
+  "addEvent": {
+    "message": "添加事件",
+    "description": "添加事件按钮文本"
+  },
+  "eventName": {
+    "message": "事件名称",
+    "description": "事件名称输入框标签"
+  },
+  "eventTime": {
+    "message": "事件日期",
+    "description": "事件日期输入框标签"
+  },
+  "deleteEvent": {
+    "message": "删除",
+    "description": "删除事件按钮文本"
+  },
+  "daysLeft": {
+    "message": "还剩 $DAYS$ 天",
+    "description": "显示剩余天数",
+    "placeholders": {
+      "days": {
+        "content": "$1",
+        "example": "42"
+      }
+    }
+  },
+  "notificationTitle": {
+    "message": "事件倒计时提醒",
+    "description": "通知标题"
+  },
+  "notificationMessage": {
+    "message": "$EVENT_NAME$ 将在 $DAYS$ 天后到来",
+    "description": "通知消息",
+    "placeholders": {
+      "event_name": {
+        "content": "$1"
+      },
+      "days": {
+        "content": "$2"
+      }
+    }
+  }
+} 
