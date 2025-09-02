@@ -18,6 +18,9 @@ const TimeUtils = {
 
 // 事件管理
 const eventManager = {
+    // 当前显示的事件
+    nextEvent: null,
+
     async getEvents() {
         const result = await chrome.storage.local.get(['events']);
         return result.events || [];
@@ -41,26 +44,23 @@ const eventManager = {
             alert('请填写定时事件时间！');
             return;
         }
-
-        const milliseconds = TimeUtils.getMilliseconds(...date.split(':').map(Number))
-        if (milliseconds < 30 * 1000) {
-            alert('定时事件时间太短！');
-            return;
-        }
         
         const events = await this.getEvents();
+        const milliseconds = TimeUtils.getMilliseconds(...date.split(':').map(Number))
         const newEvent = {
             id: Date.now() + 'event',
             name,
             milliseconds,
-            show: '0',  // '0' 在主栏隐藏，'1' 在主栏显示，'2' 开始，'3' 暂停
-            defaultDate: date,
-            date: date
+            show: true,
+            open: false,
+            defaultDate: date
         };
         
         for(let i = 0;i < events.length;i++) {
-            events[i].show = '0'
+            events[i].show = false
+            events[i].open = false
         }
+        this.nextEvent = newEvent
         events.push(newEvent);
         await this.saveEvents(events);
         return true;
@@ -68,14 +68,18 @@ const eventManager = {
     
     async deleteEvent(id) {
         const events = await this.getEvents();
-        const filteredEvents = events.filter(event => event.id === id);
+        const filteredEvents = events.filter(event => event.id !== id);
+        if (this.nextEvent && this.nextEvent.id === id) {
+            this.nextEvent = null
+            this.clearTimeout()
+        }
         await this.saveEvents(filteredEvents);
         // showNotification('事件已删除');
     },
     
     updateUI(events) {
         this.displayEvents(events);
-        this.updateNextEvent(events);
+        this.updateNextEvent();
     },
     
     displayEvents(events) {
@@ -85,11 +89,15 @@ const eventManager = {
         events.forEach(event => {
                 const eventElement = document.createElement('div');
                 eventElement.className = 'event-item';
+                let toggle = `<button class="start-btn" data-id="${event.id}">开始</button>`
+                if (event.open) {
+                    toggle = `<button class="pause-btn" data-id="${event.id}">暂停</button>`
+                }
                 eventElement.innerHTML = `
                     <div class="event-name">${event.name}</div>
                     <div class="event-countdown">${event.defaultDate}</div>
                     <div class="event-btn">
-                    <button class="toggle-btn" data-id="${event.id}">${event.show === '3' ? '暂停' : '开始'}</button>
+                    ${toggle}
                     <button class="delete-btn" title="删除" data-id="${event.id}">×</button>
                     </div>
                 `;
@@ -98,16 +106,13 @@ const eventManager = {
             });
     },
     
-    updateNextEvent(events) {
-        // todo
-        const nextEvent = events.filter(evn => evn.show !== '0')[0];
-            
+    updateNextEvent() {
         const nextEventName = document.getElementById('nextEventName');
         const nextEventCountdown = document.getElementById('nextEventCountdown');
         
-        if (nextEvent) {
-            const downTime = TimeUtils.parseMilliseconds(nextEvent.milliseconds);
-            nextEventName.textContent = nextEvent.name;
+        if (this.nextEvent) {
+            const downTime = TimeUtils.parseMilliseconds(this.nextEvent.milliseconds);
+            nextEventName.textContent = this.nextEvent.name;
             nextEventCountdown.textContent = downTime;
         } else {
             nextEventName.textContent = '暂无事件';
@@ -115,28 +120,92 @@ const eventManager = {
         }
     },
     
+    timer: null,
+    endTime: 0, // 结束的毫秒时间戳
+    
+    clearTimeout() {
+        clearTimeout(this.timer)
+        this.timer = null
+    },
+    
     // 开始倒计时
     async start(id) {
+        this.clearTimeout()
         const events = await this.getEvents();
         const filteredEvent = events.filter(event => event.id === id)[0];
         if (!filteredEvent) return
-        // 暂停
-        if (filteredEvent.show === '3') {
-            filteredEvent.show === '2'
-        } else {
-            for(let i = 0;i < events.length;i++) {
-                if (events[i].id === id) {
-                    events[i].show = '3'
-                } else {
-                    events[i].show = '0'
-                }
-            }
-            await this.saveEvents(events);
+        // nextEvent 存在，但是肯定点击开始的不是 nextEvent，需要把 nextEvent 时间重置
+        if (this.nextEvent && this.nextEvent.id !== id) {
+            const filteredNextEvent = events.filter(event => event.id === this.nextEvent.id)[0];
+            if (!filteredNextEvent) return
+            const mills = TimeUtils.getMilliseconds(...filteredNextEvent.defaultDate.split(':').map(Number))
+            filteredNextEvent.milliseconds = mills
         }
+        this.nextEvent = filteredEvent
+        for(let i = 0;i < events.length;i++) {
+            if (events[i].id === id) {
+                events[i].show = true
+                events[i].open = true
+            } else {
+                events[i].show = false
+                events[i].open = false
+            }
+        }
+        await this.saveEvents(events);
         // 结束时间戳 = 此刻时间戳 + 剩余的时间
-        // this.endTime = Date.now() + this.remainTime
-        // this.toTick()
-    }
+        this.endTime = Date.now() + this.nextEvent.milliseconds
+        await this.macroTick()
+    },
+    
+    // 暂停倒计时
+    async pause(id) {
+        this.clearTimeout()
+        this.nextEvent.show = true
+        this.nextEvent.open = false
+        await this.saveEvents(events);
+    },
+    
+    // 定时器
+    async macroTick() {
+        // 每隔一定时间，更新一遍定时器的值
+        this.timer = setTimeout(async () => {
+            console.log('1111', new Date().toLocaleTimeString())
+            // 获取剩余时间
+            const remain = this.getRemainTime()
+            // 如果时间已到，停止倒计时
+            if (remain === 0) {
+                this.nextEvent.milliseconds = 0
+                await this.end()
+            // 重设剩余时间
+            } else {
+                if (!this.isSameSecond(remain, this.nextEvent.milliseconds)) {
+                    this.nextEvent.milliseconds = remain
+                    this.updateNextEvent();
+                }
+                await this.macroTick()
+            }
+        }, 30)
+    },
+    // 获取剩余的时间
+    isSameSecond(time1, time2) {
+        return Math.floor(time1 / 1000) === Math.floor(time2 / 1000)
+    },
+    // 获取剩余的时间
+    getRemainTime() {
+        // 取最大值，防止出现小于0的剩余时间值
+        return Math.max(this.endTime - Date.now(), 0)
+    },
+    // 暂停倒计时
+    async end() {
+        const events = await this.getEvents();
+        const filteredEvent = events.filter(event => event.id = this.nextEvent.id)[0];
+        if (!filteredEvent) return
+        // 暂停
+        filteredEvent.open = false
+        filteredEvent.milliseconds = this.nextEvent.milliseconds
+        await this.saveEvents(events);
+        showNotification(filteredEvent.name);
+    },
 };
 
 // 补0，如1 -> 01
@@ -174,7 +243,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('addEventForm').classList.remove('hidden');
         document.getElementById('addEventBtn').classList.add('hidden');
         const result = await chrome.storage.sync.get(['defaultDate']);
-        const defaultDate = result.defaultDate || "01:00:00";
+        const defaultDate = result.defaultDate || "00:01:00";
         flatpickr("#eventTime", {
             enableTime: true,
             enableSeconds: true,
@@ -209,14 +278,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('eventsList').addEventListener('click', async (e) => {
         if (e.target.classList.contains('delete-btn')) {
             await eventManager.deleteEvent(e.target.dataset.id);
-        } else if (e.target.classList.contains('toggle-btn')) {
+        } else if (e.target.classList.contains('start-btn')) {
             await eventManager.start(e.target.dataset.id);
+        } else if (e.target.classList.contains('pause-btn')) {
+            await eventManager.pause(e.target.dataset.id);
         }
     });
 });
-
-// 定期更新倒计时显示
-// setInterval(async () => {
-//     const events = await eventManager.getEvents();
-//     eventManager.updateUI(events);
-// }, 60000); 

@@ -4,7 +4,7 @@
     "description": "Extension name"
   },
   "extensionDescription": {
-    "message": "Displays countdown days for upcoming events, helping you track important dates. Supports adding and deleting events with reminder notifications.",
+    "message": "Add a countdown event and give a reminder when the time is up. You can set a timed reminder to drink water and avoid sitting for a long time.",
     "description": "Extension description"
   },
   "addNewEvent": {

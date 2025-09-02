@@ -177,7 +177,7 @@ input:focus {
     opacity: 1;
 }
 
-.toggle-btn {
+.start-btn, .pause-btn {
     padding: 4px 8px;
     background-color: var(--accent-color);
     color: white;
@@ -189,7 +189,7 @@ input:focus {
     transition: opacity 0.2s;
 }
 
-.toggle-btn:hover {
+.start-btn:hover, .pause-btn:hover {
     opacity: 1;
 }
 

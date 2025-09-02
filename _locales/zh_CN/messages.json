@@ -4,7 +4,7 @@
     "description": "扩展名称"
   },
   "extensionDescription": {
-    "message": "显示最近事件的倒计时天数，帮助您追踪重要事件的时间。支持添加、删除事件，并提供倒计时提醒功能。",
+    "message": "添加倒计时事件，到时间后进行提醒，可以设置定时提醒喝水，不要久坐等。",
     "description": "扩展描述"
   },
   "addEvent": {
