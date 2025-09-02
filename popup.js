@@ -51,24 +51,19 @@ const eventManager = {
             id: Date.now() + 'event',
             name,
             milliseconds,
-            show: true,
+            show: false,
             open: false,
             defaultDate: date
         };
         
-        for(let i = 0;i < events.length;i++) {
-            events[i].show = false
-            events[i].open = false
-        }
-        events.push(newEvent);
-        this.nextEvent = newEvent
         // 最多只能保存3个事件
-        if (events.length > 3) {
+        if (events.length > 2) {
             const head = events.shift()
             if (this.nextEvent && this.nextEvent.id === head.id) {
                 this.nextEvent = null
             }
         }
+        events.push(newEvent);
         await this.saveEvents(events);
         return true;
     },
@@ -96,6 +91,9 @@ const eventManager = {
         events.forEach(event => {
                 const eventElement = document.createElement('div');
                 eventElement.className = 'event-item';
+                if (this.nextEvent && event.id === this.nextEvent.id) {
+                    eventElement.className += ' event-item-active'
+                }
                 let toggle = `<button class="start-btn" data-id="${event.id}">开始</button>`
                 if (event.open) {
                     toggle = `<button class="pause-btn" data-id="${event.id}">暂停</button>`
@@ -171,10 +169,13 @@ const eventManager = {
     // 暂停倒计时
     async pause(id) {
         this.clearTimeout()
+        if (this.nextEvent && this.nextEvent.milliseconds < 1000) {
+            await this.end()
+            return
+        }
         const events = await this.getEvents();
         const index = events.findIndex(event => event.id === id);
         if (index !== -1) {
-            this.nextEvent.show = true
             this.nextEvent.open = false
             events[index] = this.nextEvent
             await this.saveEvents(events);
@@ -189,11 +190,10 @@ const eventManager = {
             const remain = this.getRemainTime()
             // 如果时间已到，停止倒计时
             if (remain === 0) {
-                this.nextEvent.milliseconds = 0
                 await this.end()
             // 重设剩余时间
             } else {
-                if (!this.isSameSecond(remain, this.nextEvent.milliseconds)) {
+                if (this.nextEvent && !this.isSameSecond(remain, this.nextEvent.milliseconds)) {
                     this.nextEvent.milliseconds = remain
                     this.updateNextEvent();
                 }
@@ -213,11 +213,11 @@ const eventManager = {
     // 暂停倒计时
     async end() {
         const events = await this.getEvents();
-        const filteredEvent = events.filter(event => event.id = this.nextEvent.id)[0];
+        const filteredEvent = events.filter(event => event.open)[0];
         if (!filteredEvent) return
         // 暂停
         filteredEvent.open = false
-        filteredEvent.milliseconds = this.nextEvent.milliseconds
+        filteredEvent.milliseconds = 0
         await this.saveEvents(events);
         showNotification(filteredEvent.name);
     },

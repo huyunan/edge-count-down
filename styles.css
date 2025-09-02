@@ -141,6 +141,10 @@ input:focus {
     margin-bottom: 5px;
 }
 
+.event-item-active {
+    background-color: #ffeee9;
+}
+
 .event-name {
     font-weight: 500;
     flex: 1;
