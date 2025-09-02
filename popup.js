@@ -60,8 +60,15 @@ const eventManager = {
             events[i].show = false
             events[i].open = false
         }
-        this.nextEvent = newEvent
         events.push(newEvent);
+        this.nextEvent = newEvent
+        // 最多只能保存3个事件
+        if (events.length > 3) {
+            const head = events.shift()
+            if (this.nextEvent && this.nextEvent.id === head.id) {
+                this.nextEvent = null
+            }
+        }
         await this.saveEvents(events);
         return true;
     },
@@ -142,6 +149,10 @@ const eventManager = {
             filteredNextEvent.milliseconds = mills
         }
         this.nextEvent = filteredEvent
+        if (this.nextEvent.milliseconds === 0) {
+            const milliseconds = TimeUtils.getMilliseconds(...this.nextEvent.defaultDate.split(':').map(Number))
+            this.nextEvent.milliseconds = milliseconds
+        }
         for(let i = 0;i < events.length;i++) {
             if (events[i].id === id) {
                 events[i].show = true
@@ -160,16 +171,20 @@ const eventManager = {
     // 暂停倒计时
     async pause(id) {
         this.clearTimeout()
-        this.nextEvent.show = true
-        this.nextEvent.open = false
-        await this.saveEvents(events);
+        const events = await this.getEvents();
+        const index = events.findIndex(event => event.id === id);
+        if (index !== -1) {
+            this.nextEvent.show = true
+            this.nextEvent.open = false
+            events[index] = this.nextEvent
+            await this.saveEvents(events);
+        }
     },
     
     // 定时器
     async macroTick() {
         // 每隔一定时间，更新一遍定时器的值
         this.timer = setTimeout(async () => {
-            console.log('1111', new Date().toLocaleTimeString())
             // 获取剩余时间
             const remain = this.getRemainTime()
             // 如果时间已到，停止倒计时
