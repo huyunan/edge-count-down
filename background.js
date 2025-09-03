@@ -46,19 +46,7 @@ async function checkNextEvent() {
 
 // 初始化扩展
 async function initializeExtension() {
-    // 立即检查一次事件
-    console.log('initializeExtension')
     await checkNextEvent();
-    
-    // 设置定时检查（每小时）
-    // chrome.alarms.create('checkEvents', {
-    //     periodInMinutes: 60
-    // });
-    
-    // // 设置更频繁的检查（每5分钟）用于保持服务工作进程活跃
-    // chrome.alarms.create('keepAlive', {
-    //     periodInMinutes: 5
-    // });
 }
 
 // 监听浏览器启动
@@ -66,16 +54,6 @@ chrome.runtime.onStartup.addListener(initializeExtension);
 
 // 监听扩展安装/更新
 chrome.runtime.onInstalled.addListener(initializeExtension);
-
-// 监听定时器
-chrome.alarms.onAlarm.addListener((alarm) => {
-    // if (alarm.name === 'checkEvents') {
-    //     checkEvents();
-    // } else if (alarm.name === 'keepAlive') {
-    //     // 保持服务工作进程活跃
-    //     chrome.storage.local.get(['events'], () => {});
-    // }
-});
 
 // 监听来自 popup 的消息
 chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
