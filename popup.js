@@ -39,11 +39,11 @@ const eventManager = {
         const eventsList = document.getElementById('eventsList');
         eventsList.innerHTML = '';
         
-        events.forEach(async event => {
+        events.forEach(async (event, index, arr) => {
                 const eventElement = document.createElement('div');
                 eventElement.className = 'event-item';
                 const nextEvent = await this.getNextEvent()
-                if (nextEvent && event.id === nextEvent.id) {
+                if (nextEvent && event.id === nextEvent.id && arr.length !== 1) {
                     eventElement.className += ' event-item-active'
                 }
                 let toggle = `<button class="start-btn" data-id="${event.id}">开始</button>`

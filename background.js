@@ -27,22 +27,28 @@ function padZero(num, targetLength = 2) {
 
 // UI 工具函数
 function showNotification(message) {
-    chrome.notifications.create({
+    chrome.notifications.clear('定时提醒Event')
+    chrome.notifications.create('定时提醒Event', {
         type: 'basic',
         iconUrl: 'icons/icon128.png',
-        title: '事件倒计时提醒',
-        message
+        title: message,
+        message: ''
     });
 }
 
 // 事件检查
-async function checkEvents() {
+async function checkNextEvent() {
+    const nextEvent = await timeManager.getNextEvent()
+    if (nextEvent && nextEvent.open) {
+        await timeManager.startForNextEvent(nextEvent)
+    }
 }
 
 // 初始化扩展
 async function initializeExtension() {
     // 立即检查一次事件
-    await checkEvents();
+    console.log('initializeExtension')
+    await checkNextEvent();
     
     // 设置定时检查（每小时）
     // chrome.alarms.create('checkEvents', {
@@ -71,11 +77,6 @@ chrome.alarms.onAlarm.addListener((alarm) => {
     // }
 });
 
-// 监听扩展图标点击
-chrome.action.onClicked.addListener(() => {
-    checkEvents();
-});
-
 // 监听来自 popup 的消息
 chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
     if (message.type === 'TIME_START') {
@@ -89,10 +90,6 @@ chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
         await timeManager.deleteEvent(message.id)
     }
 });
-
-// 初始化
-initializeExtension();
-
 // 事件管理
 const timeManager = {
     async getEvents() {
@@ -175,7 +172,6 @@ const timeManager = {
             await this.saveNextEvent(null);
         }
         await this.saveEvents(filteredEvents)
-        // showNotification('事件已删除');
     },
     
     async clearTimeout() {
@@ -200,12 +196,10 @@ const timeManager = {
             filteredNextEvent.downTime = TimeUtils.parseMilliseconds(mills);
         }
         nextEvent = filteredEvent
-        await this.saveNextEvent(nextEvent);
         if (nextEvent.milliseconds === 0) {
             const milliseconds = TimeUtils.getMilliseconds(...nextEvent.defaultDate.split(':').map(Number))
             nextEvent.milliseconds = milliseconds
             nextEvent.downTime = nextEvent.defaultDate
-            await this.saveNextEvent(nextEvent);
         }
         for(let i = 0;i < events.length;i++) {
             if (events[i].id === id) {
@@ -216,11 +210,25 @@ const timeManager = {
                 events[i].open = false
             }
         }
-        await this.saveEvents(events)
         await this.saveNextEvent(nextEvent);
+        await this.saveEvents(events)
         // 结束时间戳 = 此刻时间戳 + 剩余的时间
         const endTime = Date.now() + nextEvent.milliseconds + 900
         await this.saveEndTime(endTime)
+        await this.macroTick()
+    },
+    
+    async startForNextEvent(nextEvent) {
+        await this.clearTimeout()
+        if (nextEvent.milliseconds === 0) {
+            const milliseconds = TimeUtils.getMilliseconds(...nextEvent.defaultDate.split(':').map(Number))
+            nextEvent.milliseconds = milliseconds
+            nextEvent.downTime = nextEvent.defaultDate
+            // 结束时间戳 = 此刻时间戳 + 剩余的时间
+            const endTime = Date.now() + nextEvent.milliseconds + 900
+            await this.saveEndTime(endTime)
+        }
+        await this.saveNextEvent(nextEvent);
         await this.macroTick()
     },
     
@@ -287,6 +295,6 @@ const timeManager = {
         filteredEvent.downTime = '00:00:00'
         await this.saveEvents(events)
         showNotification(filteredEvent.name);
-        this.start(filteredEvent.id)
+        this.startForNextEvent(filteredEvent)
     },
 };
