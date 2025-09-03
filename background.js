@@ -28,9 +28,14 @@ function padZero(num, targetLength = 2) {
 // UI 工具函数
 function showNotification(message) {
     chrome.notifications.clear('定时提醒Event')
+    // 以后在设置页设置这些
+    // eventTime 与通知关联的时间戳 Date.now() + n
+    // requireInteraction 通知应一直显示在屏幕上，直到用户激活或关闭通知
+    // silent 静音 目前不好使，不能出声音，可能和电脑配置有关
     chrome.notifications.create('定时提醒Event', {
         type: 'basic',
         iconUrl: 'icons/icon128.png',
+        requireInteraction: true,
         title: message,
         message: ''
     });
