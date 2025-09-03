@@ -275,16 +275,18 @@ const timeManager = {
         // 取最大值，防止出现小于0的剩余时间值
         return Math.max(endTime - Date.now(), 0)
     },
-    // 暂停倒计时
+    // 结束第一轮倒计时
     async end() {
+        await this.clearTimeout()
         const events = await this.getEvents();
         const filteredEvent = events.filter(event => event.open)[0];
         if (!filteredEvent) return
         // 暂停
-        filteredEvent.open = false
+        // filteredEvent.open = false
         filteredEvent.milliseconds = 0
         filteredEvent.downTime = '00:00:00'
         await this.saveEvents(events)
         showNotification(filteredEvent.name);
+        this.start(filteredEvent.id)
     },
 };
