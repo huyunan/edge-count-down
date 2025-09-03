@@ -219,7 +219,7 @@ const timeManager = {
         await this.saveEvents(events)
         await this.saveNextEvent(nextEvent);
         // 结束时间戳 = 此刻时间戳 + 剩余的时间
-        const endTime = Date.now() + nextEvent.milliseconds
+        const endTime = Date.now() + nextEvent.milliseconds + 900
         await this.saveEndTime(endTime)
         await this.macroTick()
     },
