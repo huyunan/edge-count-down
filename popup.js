@@ -9,6 +9,7 @@ chrome.storage.onChanged.addListener(async (changes, namespace) => {
 chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
     if (message.type === 'UPDATE_NEXT') {
         eventManager.updateNextEvent()
+        return true
     } else if (message.type === 'ADD_SUCCESS') {
         // 保存用户习惯设置定时时间
         const eventTime = document.getElementById('eventTime').value
@@ -16,6 +17,7 @@ chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
         document.getElementById('addEventForm').classList.add('hidden');
         document.getElementById('addEventBtn').classList.remove('hidden');
         clearForm();
+        return true
     }
 });
 // 事件管理

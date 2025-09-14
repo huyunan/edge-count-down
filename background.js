@@ -50,8 +50,15 @@ async function checkNextEvent() {
 }
 
 // 初始化扩展
+let flag = true
 async function initializeExtension() {
-    await checkNextEvent();
+    if (flag) {
+        flag = false
+        await checkNextEvent();
+        setTimeout(() => {
+            flag = true
+        }, 1000 * 30);
+    }
 }
 
 // 监听浏览器启动
@@ -60,17 +67,22 @@ chrome.runtime.onStartup.addListener(initializeExtension);
 // 监听扩展安装/更新
 chrome.runtime.onInstalled.addListener(initializeExtension);
 
+chrome.windows.onCreated.addListener(initializeExtension)
 // 监听来自 popup 的消息
 chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
     if (message.type === 'TIME_START') {
         await timeManager.start(message.id)
+        return true
     } else if (message.type === 'TIME_PAUSE') {
         await timeManager.pause(message.id)
+        return true
     } else if (message.type === 'ADD_EVENT') {
         await timeManager.addEvent(message.name, message.date)
         chrome.runtime.sendMessage({ type: 'ADD_SUCCESS' });
+        return true
     } else if (message.type === 'DELETE_EVENT') {
         await timeManager.deleteEvent(message.id)
+        return true
     }
 });
 // 事件管理
