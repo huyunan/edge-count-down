@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "定时提醒",
-  "version": "1.0.1",
+  "version": "1.5.0",
   "description": "添加倒计时事件，到时间后进行提醒，可以设置定时提醒喝水，不要久坐等。",
   "author": "huyunan",
   "default_locale": "zh_CN",

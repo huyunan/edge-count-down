@@ -1,38 +1,59 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta charset="UTF-8">
-  <title>事件倒计时提醒</title>
-  <link rel="stylesheet" href="styles.css">
-  <link rel="stylesheet" href="flatpickr.min.css">
-</head>
-<body>
-  <div class="container">
-    <div class="next-event">
-      <div class="countdown-display">
-        <div id="nextEventName" class="next-event-name">暂无事件</div>
-        <div id="nextEventCountdown" class="next-event-countdown">--</div>
+  <head>
+    <meta charset="UTF-8" />
+    <title>事件倒计时提醒</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="flatpickr.min.css" />
+  </head>
+
+  <body>
+    <aside class="aside-drawer">
+      <span id="page1" class="aside-item aside-item-select">
+        <span class="aside-item__bg"></span>
+        <span class="aside-item-container">
+          <span class="aside-item-num">1</span>
+        </span>
+      </span>
+      <span id="page2" class="aside-item">
+        <span class="aside-item__bg"></span>
+        <span class="aside-item-container">
+          <span class="aside-item-num">2</span>
+        </span>
+      </span>
+      <span id="page3" class="aside-item">
+        <span class="aside-item__bg"></span>
+        <span class="aside-item-container">
+          <span class="aside-item-num">3</span>
+        </span>
+      </span>
+    </aside>
+    <div class="container">
+      <div class="next-event">
+        <div class="countdown-display">
+          <div id="pageEventName" class="next-event-name">暂无事件</div>
+          <div id="pageEventCountdown" class="next-event-countdown">--</div>
+        </div>
+      </div>
+
+      <div class="add-event-section">
+        <button id="addEventBtn" class="add-event-btn">+ 添加新事件</button>
+      </div>
+
+      <div id="addEventForm" class="add-event-form hidden">
+        <input type="text" id="eventName" placeholder="事件名称" />
+        <input type="type" id="eventTime" />
+        <div class="form-buttons">
+          <button id="cancelAdd" class="cancel-btn">取消</button>
+          <button id="confirmAdd" class="confirm-btn">确定</button>
+        </div>
+      </div>
+
+      <div class="events-list">
+        <div id="eventsList"></div>
       </div>
     </div>
-
-    <div class="add-event-section">
-      <button id="addEventBtn" class="add-event-btn">+ 添加新事件</button>
-    </div>
-
-    <div id="addEventForm" class="add-event-form hidden">
-      <input type="text" id="eventName" placeholder="事件名称">
-      <input type="type" id="eventTime">
-      <div class="form-buttons">
-        <button id="cancelAdd" class="cancel-btn">取消</button>
-        <button id="confirmAdd" class="confirm-btn">确定</button>
-      </div>
-    </div>
-
-    <div class="events-list">
-      <div id="eventsList"></div>
-    </div>
-  </div>
-  <script src="popup.js"></script>
-  <script src="flatpickr.min.js"></script>
-</body>
-</html> 
+    <script src="popup.js"></script>
+    <script src="flatpickr.min.js"></script>
+  </body>
+</html>
