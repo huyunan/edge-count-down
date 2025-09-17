@@ -47,6 +47,7 @@ body {
 }
 
 .next-event-countdown {
+  font-variant-numeric: tabular-nums;
   font-size: 24px;
   color: var(--primary-color);
   font-weight: bold;
