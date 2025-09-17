@@ -107,7 +107,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("addEventForm").classList.remove("hidden");
     document.getElementById("addEventBtn").classList.add("hidden");
     const result = await chrome.storage.sync.get(["defaultDate"]);
-    const defaultDate = result.defaultDate || "00:01:00";
+    const defaultDate = result.defaultDate || "01:00:00";
     flatpickr("#eventTime", {
       enableTime: true,
       enableSeconds: true,
@@ -163,13 +163,13 @@ async function switchTab(page) {
   tabPage = page;
   await eventManager.saveTabPage(page);
   const pageEvent = await eventManager.getPageEvent(page);
-  eventManager
-    .updatePageEvent(page, pageEvent)
-    [("page1", "page2", "page3")].forEach((pp) => {
-      if (page === pp) {
-        document.getElementById(pp).classList.add("aside-item-select");
-      } else {
-        document.getElementById(pp).classList.remove("aside-item-select");
-      }
-    });
+  eventManager.updatePageEvent(page, pageEvent)
+  const pages = ["page1", "page2", "page3"]
+  pages.forEach(pp => {
+    if (page === pp) {
+      document.getElementById(pp).classList.add("aside-item-select");
+    } else {
+      document.getElementById(pp).classList.remove("aside-item-select");
+    }
+  });
 }

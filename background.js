@@ -99,8 +99,26 @@ const timeManager = {
     return result[`page_event_${page}`];
   },
 
+  async getEndTime(page) {
+    const result = await chrome.storage.local.get([`end_time_${page}`]);
+    return result[`end_time_${page}`] || 0;
+  },
+
+  async getTimer(page) {
+    const result = await chrome.storage.local.get([`timer_${page}`]);
+    return result[`timer_${page}`];
+  },
+
   async savePageEvent(pageEvent, page) {
     await chrome.storage.local.set({ [`page_event_${page}`]: pageEvent });
+  },
+
+  async saveEndTime(endTime, page) {
+    await chrome.storage.local.set({ [`end_time_${page}`]: endTime });
+  },
+
+  async saveTimer(timer, page) {
+    await chrome.storage.local.set({ [`timer_${page}`]: timer });
   },
 
   async addEvent(name, date, page) {
@@ -122,8 +140,6 @@ const timeManager = {
       name,
       milliseconds,
       downTime: date,
-      timer: null,
-      endTime: Date().now,
       open: false,
       defaultDate: date,
     };
@@ -133,13 +149,13 @@ const timeManager = {
   async deleteEvent(page) {
     await this.clearTimeout(page);
     await this.savePageEvent(null, page);
+    await this.saveEndTime(null, page)
   },
 
   async clearTimeout(page) {
-    const pageEvent = await this.getPageEvent(page);
-    clearTimeout(pageEvent.timer);
-    pageEvent.timer = null;
-    await this.savePageEvent(pageEvent, page);
+    const timer = await this.getTimer(page);
+    clearTimeout(timer);
+    await this.saveTimer(null, page);
   },
 
   // 开始倒计时
@@ -156,7 +172,8 @@ const timeManager = {
     }
     pageEvent.open = true;
     // 结束时间戳 = 此刻时间戳 + 剩余的时间
-    pageEvent.endTime = Date.now() + pageEvent.milliseconds + 900;
+    const endTime = Date.now() + pageEvent.milliseconds + 900;
+    await this.saveEndTime(endTime, page);
     await this.savePageEvent(pageEvent, page);
     await this.macroTick(page);
   },
@@ -171,7 +188,7 @@ const timeManager = {
       pageEvent.downTime = pageEvent.defaultDate;
       // 结束时间戳 = 此刻时间戳 + 剩余的时间
       const endTime = Date.now() + pageEvent.milliseconds + 900;
-      pageEvent.endTime = endTime;
+      await this.saveEndTime(endTime, page);
       await this.savePageEvent(pageEvent, page);
     }
     await this.savePageEvent(pageEvent, page);
@@ -213,9 +230,7 @@ const timeManager = {
         await this.macroTick(page);
       }
     }, 30);
-    const pageEvent = await this.getPageEvent(page);
-    pageEvent.timer = timer;
-    await this.savePageEvent(pageEvent, page);
+    await this.saveTimer(timer, page);
   },
   // 获取剩余的时间
   isSameSecond(time1, time2) {
@@ -223,8 +238,7 @@ const timeManager = {
   },
   // 获取剩余的时间
   async getRemainTime(page) {
-    const pageEvent = await this.getPageEvent(page);
-    const endTime = pageEvent.endTime;
+    const endTime = await this.getEndTime(page);
     // 取最大值，防止出现小于0的剩余时间值
     return Math.max(endTime - Date.now(), 0);
   },
