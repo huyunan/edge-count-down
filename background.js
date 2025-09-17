@@ -158,6 +158,8 @@ const timeManager = {
 
   async clearTimeout(page) {
     const timer = await this.getTimer(page);
+
+    console.log('pause timer', page, timer)
     clearTimeout(timer);
     this.saveTimer(null, page);
   },
@@ -200,6 +202,7 @@ const timeManager = {
 
   // 暂停倒计时
   async pause(page) {
+    console.log('pause', page)
     await this.clearTimeout(page);
     const pageEvent = await this.getPageEvent(page);
     if (pageEvent && pageEvent.milliseconds < 1000) {

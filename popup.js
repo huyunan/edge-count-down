@@ -3,17 +3,19 @@ let tabPage = "page1";
 
 // 监听存储变化
 chrome.storage.onChanged.addListener(async (changes, namespace) => {
-  if (namespace === "local" && changes["page_event_page1"]) {
-    eventManager.displayEvents("page1", changes["page_event_page1"].newValue);
-    eventManager.updatePageEvent("page1", changes["page_event_page1"].newValue);
-  } else if (namespace === "local" && changes["page_event_page2"]) {
-    eventManager.displayEvents("page2", changes["page_event_page2"].newValue);
-    eventManager.updatePageEvent("page2", changes["page_event_page2"].newValue);
-  } else if (namespace === "local" && changes["page_event_page3"]) {
-    eventManager.displayEvents("page3", changes["page_event_page3"].newValue);
-    eventManager.updatePageEvent("page3", changes["page_event_page3"].newValue);
+  if (namespace === "local") {
+    changeUpdate("page1", changes)
+    changeUpdate("page2", changes)
+    changeUpdate("page3", changes)
   }
 });
+
+function changeUpdate(page, changes) {
+  if (changes[`page_event_${page}`]) {
+    eventManager.displayEvents(page, changes[`page_event_${page}`].newValue);
+    eventManager.updatePageEvent(page, changes[`page_event_${page}`].newValue);
+  }
+}
 
 // 监听来自 background 的消息
 chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
@@ -56,7 +58,12 @@ const eventManager = {
     if (page !== tabPage) return;
     const eventsList = document.getElementById("eventsList");
     eventsList.innerHTML = "";
-    if (!pageEvent) return;
+    const addEventBtn = document.getElementById("addEventBtn");
+    if (!pageEvent) {
+      addEventBtn.style.display = 'inline-block'
+      return
+    };
+    addEventBtn.style.display = 'none'
     const eventElement = document.createElement("div");
     eventElement.className = "event-item";
     let toggle = `<button class="start-btn">开始</button>`;
@@ -98,9 +105,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   // 加载事件
   tabPage = await eventManager.getTabPage();
   await switchTab(tabPage);
-  const pageEvent = await eventManager.getPageEvent(tabPage);
-  eventManager.displayEvents(tabPage, pageEvent);
-  eventManager.updatePageEvent(tabPage, pageEvent);
 
   // 设置事件监听
   document.getElementById("addEventBtn").addEventListener("click", async () => {
