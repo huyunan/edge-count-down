@@ -227,13 +227,19 @@ const timeManager = {
         // 重设剩余时间
       } else {
         const pageEvent = await this.getPageEvent(page);
-        if (pageEvent && !this.isSameSecond(remain, pageEvent.milliseconds)) {
+        if (!pageEvent) return
+        if (!this.isSameSecond(remain, pageEvent.milliseconds)) {
           pageEvent.milliseconds = remain;
           pageEvent.downTime = TimeUtils.parseMilliseconds(remain);
           await this.savePageEvent(pageEvent, page);
           chrome.runtime.sendMessage({ type: "UPDATE_NEXT", page });
         }
-        this.macroTick(page);
+        if (pageEvent.open) {
+          this.macroTick(page);
+        } else {
+          // 已经暂停
+          await this.clearTimeout(page)
+        }
       }
     }, 30);
     await this.saveTimer(timer, page);
@@ -258,6 +264,8 @@ const timeManager = {
     pageEvent.milliseconds = 0;
     pageEvent.downTime = "00:00:00";
     await this.savePageEvent(pageEvent, page);
+    // 暂停状态
+    if (!pageEvent.open) return
     showNotification(pageEvent.name, page);
     this.startForPageEvent(pageEvent, page);
   },
