@@ -73,7 +73,7 @@ chrome.windows.onCreated.addListener(initializeExtension);
 // 监听来自 popup 的消息
 chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
   if (message.type === "TIME_START") {
-    await timeManager.start(message.page);
+    timeManager.start(message.page);
     return true;
   } else if (message.type === "TIME_PAUSE") {
     await timeManager.pause(message.page);
@@ -155,7 +155,7 @@ const timeManager = {
   async clearTimeout(page) {
     const timer = await this.getTimer(page);
     clearTimeout(timer);
-    await this.saveTimer(null, page);
+    this.saveTimer(null, page);
   },
 
   // 开始倒计时
@@ -173,9 +173,9 @@ const timeManager = {
     pageEvent.open = true;
     // 结束时间戳 = 此刻时间戳 + 剩余的时间
     const endTime = Date.now() + pageEvent.milliseconds + 900;
-    await this.saveEndTime(endTime, page);
+    this.saveEndTime(endTime, page);
     await this.savePageEvent(pageEvent, page);
-    await this.macroTick(page);
+    this.macroTick(page);
   },
 
   async startForPageEvent(pageEvent, page) {
@@ -188,11 +188,10 @@ const timeManager = {
       pageEvent.downTime = pageEvent.defaultDate;
       // 结束时间戳 = 此刻时间戳 + 剩余的时间
       const endTime = Date.now() + pageEvent.milliseconds + 900;
-      await this.saveEndTime(endTime, page);
-      await this.savePageEvent(pageEvent, page);
+      this.saveEndTime(endTime, page);
     }
     await this.savePageEvent(pageEvent, page);
-    await this.macroTick(page);
+    this.macroTick(page);
   },
 
   // 暂停倒计时
@@ -227,7 +226,7 @@ const timeManager = {
           await this.savePageEvent(pageEvent, page);
           chrome.runtime.sendMessage({ type: "UPDATE_NEXT", page });
         }
-        await this.macroTick(page);
+        this.macroTick(page);
       }
     }, 30);
     await this.saveTimer(timer, page);
