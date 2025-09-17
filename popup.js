@@ -64,7 +64,6 @@ const eventManager = {
       toggle = `<button class="pause-btn">暂停</button>`;
     }
     eventElement.innerHTML = `
-            <div class="event-name">${pageEvent.name}</div>
             <div class="event-countdown">${pageEvent.defaultDate}</div>
             <div class="event-btn">
             ${toggle}
@@ -74,7 +73,7 @@ const eventManager = {
     eventsList.appendChild(eventElement);
   },
 
-  async updatePageEvent(page, pageEvent) {
+  updatePageEvent(page, pageEvent) {
     if (page !== tabPage) return;
     const pageEventName = document.getElementById("pageEventName");
     const pageEventCountdown = document.getElementById("pageEventCountdown");
@@ -98,6 +97,7 @@ function clearForm() {
 document.addEventListener("DOMContentLoaded", async () => {
   // 加载事件
   tabPage = await eventManager.getTabPage();
+  await switchTab(tabPage);
   const pageEvent = await eventManager.getPageEvent(tabPage);
   eventManager.displayEvents(tabPage, pageEvent);
   eventManager.updatePageEvent(tabPage, pageEvent);
@@ -164,6 +164,7 @@ async function switchTab(page) {
   await eventManager.saveTabPage(page);
   const pageEvent = await eventManager.getPageEvent(page);
   eventManager.updatePageEvent(page, pageEvent)
+  eventManager.displayEvents(page, pageEvent)
   const pages = ["page1", "page2", "page3"]
   pages.forEach(pp => {
     if (page === pp) {

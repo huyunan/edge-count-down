@@ -39,6 +39,10 @@ function showNotification(message, page) {
     title: message,
     message: "",
   });
+  // 点击关闭 mac
+  chrome.notifications.onClicked.addListener(id => {
+    chrome.notifications.clear(id);
+  })
 }
 
 // 事件检查
