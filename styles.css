@@ -258,6 +258,7 @@ input:focus {
   background: rgb(95, 136, 157);
 }
 .aside-item-num {
+  caret-color: transparent;
   width: 24px;
   display: flex;
   color: rgb(255, 255, 255);
