@@ -63,7 +63,7 @@ async function initializeExtension() {
     await checkNextEvent("page3");
     setTimeout(() => {
       flag = true;
-    }, 1000 * 30);
+    }, 1000 * 60);
   }
 }
 
@@ -190,10 +190,10 @@ const timeManager = {
       );
       pageEvent.milliseconds = milliseconds;
       pageEvent.downTime = pageEvent.defaultDate;
-      // 结束时间戳 = 此刻时间戳 + 剩余的时间
-      const endTime = Date.now() + pageEvent.milliseconds + 900;
-      this.saveEndTime(endTime, page);
     }
+    // 结束时间戳 = 此刻时间戳 + 剩余的时间
+    const endTime = Date.now() + pageEvent.milliseconds + 900;
+    this.saveEndTime(endTime, page);
     await this.savePageEvent(pageEvent, page);
     this.macroTick(page);
   },
@@ -219,8 +219,8 @@ const timeManager = {
       // 获取剩余时间
       const remain = await this.getRemainTime(page);
       // 如果时间已到，停止倒计时
-      if (remain === 0) {
-        await this.end(page);
+      if (remain === 0 || remain === -1) {
+        await this.end(page, remain);
         // 重设剩余时间
       } else {
         const pageEvent = await this.getPageEvent(page);
@@ -249,10 +249,17 @@ const timeManager = {
   async getRemainTime(page) {
     const endTime = await this.getEndTime(page);
     // 取最大值，防止出现小于0的剩余时间值
-    return Math.max(endTime - Date.now(), 0);
+    const diff = endTime - Date.now()
+    if (diff >= 0) {
+      return diff
+    } else if (Math.abs(diff) >= 10 * 60 * 60 * 1000) {
+      return -1
+    } else {
+      return 0
+    }
   },
   // 结束第一轮倒计时
-  async end(page) {
+  async end(page, remain) {
     await this.clearTimeout(page);
     const pageEvent = await this.getPageEvent(page);
     if (!pageEvent) return;
@@ -263,7 +270,9 @@ const timeManager = {
     await this.savePageEvent(pageEvent, page);
     // 暂停状态
     if (!pageEvent.open) return
-    showNotification(pageEvent.name, page);
+    if (remain === 0) {
+      showNotification(pageEvent.name, page);
+    }
     this.startForPageEvent(pageEvent, page);
   },
 };

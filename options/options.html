@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>定时提醒扩展设置选项</title>
+    <link href="./options.css" rel="stylesheet" />
+  </head>
+
+  <body style="">
+    <div id="app">
+      <div class="trans-ctx--container-options">
+        <div class="trans-ctx--container-header">
+          <div class="trans-ctx--name">定时提醒插件</div>
+        </div>
+        <div class="trans-ctx--container-config-panel">
+          <div class="trans-ctx--wrapper-config-panel">
+            <div class="trans-ctx--title">扩展设置选项</div>
+            <div class="trans-ctx--form-item">
+              <div class="trans-ctx--form-item-label">Tab页：</div>
+              <div class="t-select__wrap trans-ctx--selector-language">
+                <div class="t-select t-select-input" id="tabSelect">
+                  <div class="t-input__wrap" value="Tab1">
+                    <div
+                      class="t-input t-is-readonly t-size-m t-align-left t-is-default t-input--prefix t-input--suffix"
+                    >
+                      <div class="t-input__prefix"></div>
+                      <input
+                        placeholder="请选择"
+                        type="text"
+                        class="t-input__inner"
+                        readonly=""
+                        value="Tab1"
+                      /><span class="t-input__suffix t-input__suffix-icon"
+                        ><svg
+                          class="t-fake-arrow t-select__right-icon"
+                          width="16"
+                          height="16"
+                          viewBox="0 0 16 16"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M3.75 5.7998L7.99274 10.0425L12.2361 5.79921"
+                            stroke="black"
+                            stroke-opacity="0.9"
+                            stroke-width="1.3"
+                          ></path></svg
+                      ></span>
+                    </div>
+                  </div>
+                  <div
+                    class="t-popup t-select__dropdown t-popup--animation-leave-active t-popup--animation-leave-to"
+                    data-popper-reference-hidden="false"
+                    data-popper-escaped="false"
+                    data-popper-placement="bottom-start"
+                    style="
+                      position: absolute;
+                      inset: 0px auto auto 0px;
+                      top: 32px;
+                      display: none;
+                    "
+                  >
+                    <div class="t-popup__content" style="width: 170px">
+                      <div
+                        class="t-select__dropdown-inner t-select__dropdown-inner--size-m"
+                      >
+                        <ul class="t-select__list">
+                          <li class="t-select-option">
+                            <span title="ar">Tab1</span>
+                          </li>
+                          <li class="t-select-option">
+                            <span title="de">Tab2</span>
+                          </li>
+                          <li class="t-select-option">
+                            <span title="ru">Tab3</span>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="trans-ctx--tip">保存对选中Tab的设置</div>
+            </div>
+            <div class="trans-ctx--form-item">
+              <div class="trans-ctx--form-item-label">通知提醒选项：</div>
+              <div>
+                <div class="t-input__wrap cd-input__label" value="Tab1">
+                  <span class="t-radio__label"><span>提示停留时间（秒）：</span></span>
+                  <div
+                    class="t-input t-is-readonly t-size-m t-align-left t-is-default t-input--prefix t-input--suffix"
+                  >
+                    <div class="t-input__prefix"></div>
+                    <input
+                      placeholder="请输入"
+                      type="number"
+                      class="t-input__inner"
+                      readonly=""
+                      value=""
+                    />
+                  </div>
+                </div>
+                <label
+                  class="t-checkbox cd-checkbox trans-ctx--transmart-crx-checkbox t-is-checked"
+                  ><input
+                    type="checkbox"
+                    class="t-checkbox__former"
+                    value=""
+                    checked=""
+                  /><span class="t-checkbox__input"></span
+                  ><span class="t-checkbox__label">通知一直显示，直到用户关闭</span></label
+                >
+                <label
+                  class="t-checkbox cd-checkbox trans-ctx--transmart-crx-checkbox t-is-checked"
+                  ><input
+                    type="checkbox"
+                    class="t-checkbox__former"
+                    value=""
+                    checked=""
+                  /><span class="t-checkbox__input"></span
+                  ><span class="t-checkbox__label">用户点击通知内容即关闭</span></label
+                >
+                <label
+                  class="t-checkbox cd-checkbox trans-ctx--transmart-crx-checkbox"
+                  ><input
+                    type="checkbox"
+                    class="t-checkbox__former"
+                    value=""
+                    checked=""
+                  /><span class="t-checkbox__input"></span
+                  ><span class="t-checkbox__label">提醒声音</span></label
+                >
+                <div class="trans-ctx--choose-words-options">
+                  <div class="trans-ctx--transmart-crx-option-title">
+                    定时提醒是否轮询：
+                  </div>
+                  <div class="t-radio-group t-size-m t-radio-group__outline">
+                    <label class="t-radio t-is-checked"
+                      ><input
+                        type="radio"
+                        class="t-radio__former"
+                        value="popup"
+                        checked=""
+                      /><span class="t-radio__input"></span
+                      ><span class="t-radio__label"
+                        ><span>不间断提醒</span></span
+                      ></label
+                    ><label class="t-radio"
+                      ><input
+                        type="radio"
+                        class="t-radio__former"
+                        value="immediately"
+                      /><span class="t-radio__input"></span
+                      ><span class="t-radio__label"
+                        ><span>提醒一次</span></span
+                      ></label
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- <div class="trans-ctx--form-item">
+              <div class="trans-ctx--form-item-label">提醒方式选项：</div>
+              <div class="trans-ctx--page-translate-options">
+                <div class="trans-ctx--target-text-style-config">
+                  <label class="t-checkbox trans-ctx--transmart-crx-checkbox"
+                    ><input
+                      type="checkbox"
+                      class="t-checkbox__former"
+                      value=""
+                    /><span class="t-checkbox__input"></span
+                    ><span class="t-checkbox__label"
+                      >通知提醒</span
+                    ></label
+                  >
+                </div>
+                <div class="trans-ctx--target-text-style-config">
+                  <label class="t-checkbox trans-ctx--transmart-crx-checkbox"
+                    ><input
+                      type="checkbox"
+                      class="t-checkbox__former"
+                      value=""
+                    /><span class="t-checkbox__input"></span
+                    ><span class="t-checkbox__label"
+                      >弹出框提醒</span
+                    ></label
+                  >
+                </div>
+              </div>
+            </div> -->
+            <div class="trans-ctx--btn-group">
+              <button
+                type="button"
+                class="t-button t-button--theme-primary t-button--variant-base"
+              >
+                <span class="t-button__text">保存</span></button
+              ><button
+                type="button"
+                class="t-button t-button--theme-default t-button--variant-base"
+              >
+                <span class="t-button__text">重置</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script defer="defer" src="./options.js"></script>
+  </body>
+</html>
