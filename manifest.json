@@ -13,12 +13,6 @@
   ],
   "action": {
     "default_popup": "popup.html",
-    "default_icon": {
-      "128": "icons/icon128.png",
-      "48": "icons/icon48.png",
-      "32": "icons/icon32.png",
-      "16": "icons/icon16.png"
-    },
     "default_title": "定时提醒"
   },
   "options_page":"options/options.html",

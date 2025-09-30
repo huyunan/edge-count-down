@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>定时提醒扩展设置选项</title>
+    <title>定时提醒扩展设置</title>
     <link href="./options.css" rel="stylesheet" />
   </head>
 
@@ -21,7 +21,7 @@
               <div class="trans-ctx--form-item-label">Tab页：</div>
               <div class="t-select__wrap trans-ctx--selector-language">
                 <div class="t-select t-select-input" id="tabSelect">
-                  <div class="t-input__wrap" value="Tab1">
+                  <div class="t-input__wrap">
                     <div
                       class="t-input t-is-readonly t-size-m t-align-left t-is-default t-input--prefix t-input--suffix"
                     >
@@ -67,14 +67,14 @@
                         class="t-select__dropdown-inner t-select__dropdown-inner--size-m"
                       >
                         <ul class="t-select__list">
-                          <li class="t-select-option">
-                            <span title="ar">Tab1</span>
+                          <li class="t-select-option cd-select-tab1">
+                            <span>Tab1</span>
                           </li>
-                          <li class="t-select-option">
-                            <span title="de">Tab2</span>
+                          <li class="t-select-option cd-select-tab2">
+                            <span>Tab2</span>
                           </li>
-                          <li class="t-select-option">
-                            <span title="ru">Tab3</span>
+                          <li class="t-select-option cd-select-tab3">
+                            <span>Tab3</span>
                           </li>
                         </ul>
                       </div>
@@ -96,13 +96,13 @@
                     <input
                       placeholder="请输入"
                       type="number"
-                      class="t-input__inner"
-                      readonly=""
+                      class="t-input__inner cd-input__number"
                       value=""
                     />
                   </div>
                 </div>
                 <label
+                  id="cd-checkbox1"
                   class="t-checkbox cd-checkbox trans-ctx--transmart-crx-checkbox t-is-checked"
                   ><input
                     type="checkbox"
@@ -113,6 +113,7 @@
                   ><span class="t-checkbox__label">通知一直显示，直到用户关闭</span></label
                 >
                 <label
+                  id="cd-checkbox2"
                   class="t-checkbox cd-checkbox trans-ctx--transmart-crx-checkbox t-is-checked"
                   ><input
                     type="checkbox"
@@ -123,6 +124,7 @@
                   ><span class="t-checkbox__label">用户点击通知内容即关闭</span></label
                 >
                 <label
+                  id="cd-checkbox3"
                   class="t-checkbox cd-checkbox trans-ctx--transmart-crx-checkbox"
                   ><input
                     type="checkbox"
@@ -138,6 +140,7 @@
                   </div>
                   <div class="t-radio-group t-size-m t-radio-group__outline">
                     <label class="t-radio t-is-checked"
+                     id="cd-radio1"
                       ><input
                         type="radio"
                         class="t-radio__former"
@@ -148,10 +151,11 @@
                         ><span>不间断提醒</span></span
                       ></label
                     ><label class="t-radio"
+                     id="cd-radio2"
                       ><input
                         type="radio"
                         class="t-radio__former"
-                        value="immediately"
+                        value="popup"
                       /><span class="t-radio__input"></span
                       ><span class="t-radio__label"
                         ><span>提醒一次</span></span

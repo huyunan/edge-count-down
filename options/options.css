@@ -947,6 +947,10 @@ template {
   width: 100%;
 }
 
+.cd-input__number {
+  cursor: text;
+}
+
 .trans-ctx--form-item .trans-ctx--tip {
   font-size: 12px;
   position: relative;
