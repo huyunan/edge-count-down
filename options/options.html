@@ -88,12 +88,15 @@
               <div class="trans-ctx--form-item-label">通知提醒选项：</div>
               <div>
                 <div class="t-input__wrap cd-input__label" value="Tab1">
-                  <span class="t-radio__label"><span>提示停留时间（秒）：</span></span>
+                  <span class="t-radio__label"
+                    ><span>提示停留时间（秒）：</span></span
+                  >
                   <div
                     class="t-input t-is-readonly t-size-m t-align-left t-is-default t-input--prefix t-input--suffix"
                   >
                     <div class="t-input__prefix"></div>
                     <input
+                      id="cd-input-time"
                       placeholder="请输入"
                       type="number"
                       class="t-input__inner cd-input__number"
@@ -103,25 +106,27 @@
                 </div>
                 <label
                   id="cd-checkbox1"
-                  class="t-checkbox cd-checkbox trans-ctx--transmart-crx-checkbox t-is-checked"
+                  class="t-checkbox cd-checkbox trans-ctx--transmart-crx-checkbox"
                   ><input
                     type="checkbox"
                     class="t-checkbox__former"
                     value=""
-                    checked=""
                   /><span class="t-checkbox__input"></span
-                  ><span class="t-checkbox__label">通知一直显示，直到用户关闭</span></label
+                  ><span class="t-checkbox__label"
+                    >通知一直显示，直到用户关闭</span
+                  ></label
                 >
                 <label
                   id="cd-checkbox2"
-                  class="t-checkbox cd-checkbox trans-ctx--transmart-crx-checkbox t-is-checked"
+                  class="t-checkbox cd-checkbox trans-ctx--transmart-crx-checkbox"
                   ><input
                     type="checkbox"
                     class="t-checkbox__former"
                     value=""
-                    checked=""
                   /><span class="t-checkbox__input"></span
-                  ><span class="t-checkbox__label">用户点击通知内容即关闭</span></label
+                  ><span class="t-checkbox__label"
+                    >用户点击通知内容即关闭</span
+                  ></label
                 >
                 <label
                   id="cd-checkbox3"
@@ -130,7 +135,6 @@
                     type="checkbox"
                     class="t-checkbox__former"
                     value=""
-                    checked=""
                   /><span class="t-checkbox__input"></span
                   ><span class="t-checkbox__label">提醒声音</span></label
                 >
@@ -139,19 +143,16 @@
                     定时提醒是否轮询：
                   </div>
                   <div class="t-radio-group t-size-m t-radio-group__outline">
-                    <label class="t-radio t-is-checked"
-                     id="cd-radio1"
+                    <label class="t-radio" id="cd-radio1"
                       ><input
                         type="radio"
                         class="t-radio__former"
                         value="popup"
-                        checked=""
                       /><span class="t-radio__input"></span
                       ><span class="t-radio__label"
                         ><span>不间断提醒</span></span
                       ></label
-                    ><label class="t-radio"
-                     id="cd-radio2"
+                    ><label class="t-radio" id="cd-radio2"
                       ><input
                         type="radio"
                         class="t-radio__former"
@@ -197,10 +198,12 @@
             <div class="trans-ctx--btn-group">
               <button
                 type="button"
+                id="cd-save"
                 class="t-button t-button--theme-primary t-button--variant-base"
               >
                 <span class="t-button__text">保存</span></button
               ><button
+                id="cd-reset"
                 type="button"
                 class="t-button t-button--theme-default t-button--variant-base"
               >
@@ -212,5 +215,30 @@
       </div>
     </div>
     <script defer="defer" src="./options.js"></script>
+    <div>
+      <div
+        class="t-message__list t-message-placement--top"
+        id="tdesign-message-container--top"
+        style="z-index: 5000; top: 32px; left: 50%; transform: translateX(-50%)"
+      >
+        <!-- <div>
+          <div class="t-message t-is-error">
+            <svg
+              fill="none"
+              viewBox="0 0 16 16"
+              width="1em"
+              height="1em"
+              class="t-icon t-icon-check-circle-filled"
+            >
+              <path
+                fill="currentColor"
+                d="M15 8A7 7 0 101 8a7 7 0 0014 0zM5.67 4.95L8 7.29l2.33-2.34.7.7L8.7 8l2.34 2.35-.71.7L8 8.71l-2.33 2.34-.7-.7L7.3 8 4.96 5.65l.71-.7z"
+                fill-opacity="0.9"
+              ></path></svg
+            >配置已保存
+          </div>
+        </div> -->
+      </div>
+    </div>
   </body>
 </html>
