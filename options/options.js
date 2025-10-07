@@ -1,28 +1,28 @@
 // 初始化
 document.addEventListener("DOMContentLoaded", async () => {
     // 加载事件
-    await this.updateUI('Tab1')
+    await this.updateUI('page1')
     // 设置事件监听
-    document.getElementById("tabSelect").addEventListener("click", async () => {
-        tabSelect()
+    document.getElementById("pageSelect").addEventListener("click", async () => {
+        pageSelect()
     });
-    document.querySelector('#tabSelect .cd-select-tab1').addEventListener("click", async (event) => {
+    document.querySelector('#pageSelect .cd-select-page1').addEventListener("click", async (event) => {
         event.stopPropagation()
-        document.querySelector('#tabSelect .t-input__inner').value = 'Tab1'
-        await this.updateUI('Tab1')
-        tabSelect()
+        document.querySelector('#pageSelect .t-input__inner').value = 'page1'
+        await this.updateUI('page1')
+        pageSelect()
     });
-    document.querySelector('#tabSelect .cd-select-tab2').addEventListener("click", async (event) => {
+    document.querySelector('#pageSelect .cd-select-page2').addEventListener("click", async (event) => {
         event.stopPropagation()
-        document.querySelector('#tabSelect .t-input__inner').value = 'Tab2'
-        await this.updateUI('Tab2')
-        tabSelect()
+        document.querySelector('#pageSelect .t-input__inner').value = 'page2'
+        await this.updateUI('page2')
+        pageSelect()
     });
-    document.querySelector('#tabSelect .cd-select-tab3').addEventListener("click", async (event) => {
+    document.querySelector('#pageSelect .cd-select-page3').addEventListener("click", async (event) => {
         event.stopPropagation()
-        document.querySelector('#tabSelect .t-input__inner').value = 'Tab3'
-        await this.updateUI('Tab3')
-        tabSelect()
+        document.querySelector('#pageSelect .t-input__inner').value = 'page3'
+        await this.updateUI('page3')
+        pageSelect()
     });
     document.querySelector("#cd-checkbox1").addEventListener("click", async (event) => {
         event.stopPropagation()
@@ -43,11 +43,13 @@ document.addEventListener("DOMContentLoaded", async () => {
         event.stopPropagation()
         document.getElementById('cd-radio1').classList.add("t-is-checked");
         document.getElementById('cd-radio2').classList.remove("t-is-checked");
+        document.querySelector('.cd-time-mark').classList.add("cd-time-mark__exist")
     }, true);
     document.querySelector("#cd-radio2").addEventListener("click", async (event) => {
         event.stopPropagation()
         document.getElementById('cd-radio1').classList.remove("t-is-checked");
         document.getElementById('cd-radio2').classList.add("t-is-checked");
+        document.querySelector('.cd-time-mark').classList.remove("cd-time-mark__exist")
     }, true);
     document.querySelector('#cd-input-time').addEventListener("input", async (event) => {
         if (event.target.validationMessage) {
@@ -58,9 +60,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
     document.querySelector('#cd-save').addEventListener("click", async (event) => {
         event.stopPropagation()
-        const tab = document.querySelector('#tabSelect .t-input__inner').value
+        const page = document.querySelector('#pageSelect .t-input__inner').value
         let cdTime = document.querySelector('#cd-input-time').value
-        if (!cdTime) cdTime = 10
         let check1 = false
         if (document.querySelector('#cd-checkbox1').classList.contains("t-is-checked")) check1 = true
         let check2 = false
@@ -71,31 +72,31 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (document.querySelector('#cd-radio1').classList.contains("t-is-checked")) {
             radio1 = true
         }
-        const tabData = {
+        const pageData = {
             cdTime,
             check1,
             check2,
             check3,
             radio1
         }
-        await this.saveTabData(tabData, tab)
+        await this.savePageData(pageData, page)
         const message = '配置已保存'
         createMessage(message, 't-is-success', "M8 15A7 7 0 108 1a7 7 0 000 14zM4.5 8.2l.7-.7L7 9.3l3.8-3.8.7.7L7 10.7 4.5 8.2z")
     });
     
     document.querySelector('#cd-reset').addEventListener("click", async (event) => {
         event.stopPropagation()
-        const tab = document.querySelector('#tabSelect .t-input__inner').value
-        await this.updateUI(tab)
+        const page = document.querySelector('#pageSelect .t-input__inner').value
+        await this.updateUI(page)
         const message = '配置已重置'
         createMessage(message, 't-is-success', "M8 15A7 7 0 108 1a7 7 0 000 14zM4.5 8.2l.7-.7L7 9.3l3.8-3.8.7.7L7 10.7 4.5 8.2z")
     });
 })
 
-async function getTabData(tab) {
-    const result = await chrome.storage.local.get([`${tab}_data`]);
-    return result[`${tab}_data`] || {
-        cdTime: 10,
+async function getPageData(page) {
+    const result = await chrome.storage.local.get([`${page}_data`]);
+    return result[`${page}_data`] || {
+        cdTime: '',
         check1: true,
         check2: true,
         check3: false,
@@ -103,34 +104,36 @@ async function getTabData(tab) {
     };
 }
 
-async function saveTabData(tabData, tab) {
-    await chrome.storage.local.set({ [`${tab}_data`]: tabData });
+async function savePageData(pageData, page) {
+    await chrome.storage.local.set({ [`${page}_data`]: pageData });
 }
 
-async function updateUI(tab) {
-    const tabData = await this.getTabData(tab)
-    document.querySelector('#cd-input-time').value = tabData.cdTime
-    if (tabData.check1) {
+async function updateUI(page) {
+    const pageData = await this.getPageData(page)
+    document.querySelector('#cd-input-time').value = pageData.cdTime
+    if (pageData.check1) {
         document.querySelector('#cd-checkbox1').classList.add("t-is-checked")
     } else {
         document.querySelector('#cd-checkbox1').classList.remove("t-is-checked")
     }
-    if (tabData.check2) {
+    if (pageData.check2) {
         document.querySelector('#cd-checkbox2').classList.add("t-is-checked")
     } else {
         document.querySelector('#cd-checkbox2').classList.remove("t-is-checked")
     }
-    if (tabData.check3) {
+    if (pageData.check3) {
         document.querySelector('#cd-checkbox3').classList.add("t-is-checked")
     } else {
         document.querySelector('#cd-checkbox3').classList.remove("t-is-checked")
     }
-    if (tabData.radio1) {
+    if (pageData.radio1) {
         document.querySelector('#cd-radio1').classList.add("t-is-checked")
         document.querySelector('#cd-radio2').classList.remove("t-is-checked")
+        document.querySelector('.cd-time-mark').classList.add("cd-time-mark__exist")
     } else {
         document.querySelector('#cd-radio1').classList.remove("t-is-checked")
         document.querySelector('#cd-radio2').classList.add("t-is-checked")
+        document.querySelector('.cd-time-mark').classList.remove("cd-time-mark__exist")
     }
 }
 
@@ -160,31 +163,31 @@ function createMessage(message, cls, d) {
 }
 
 function rulesCheck() {
-    document.querySelector("#tabSelect").classList.toggle("t-select-input--popup-visible");
-    document.querySelector('#tabSelect .t-input__wrap').classList.toggle("t-popup-open");
-    document.querySelector('#tabSelect .t-input').classList.toggle("t-input--focused");
-    document.querySelector('#tabSelect .t-popup').classList.toggle("t-popup--animation-leave-to");
-    document.querySelector('#tabSelect .t-popup').classList.toggle("t-popup--animation-enter-to");
-    document.querySelector('#tabSelect .t-fake-arrow').classList.toggle("t-fake-arrow--active");
-    let display = document.querySelector('#tabSelect .t-popup').style.display
+    document.querySelector("#pageSelect").classList.toggle("t-select-input--popup-visible");
+    document.querySelector('#pageSelect .t-input__wrap').classList.toggle("t-popup-open");
+    document.querySelector('#pageSelect .t-input').classList.toggle("t-input--focused");
+    document.querySelector('#pageSelect .t-popup').classList.toggle("t-popup--animation-leave-to");
+    document.querySelector('#pageSelect .t-popup').classList.toggle("t-popup--animation-enter-to");
+    document.querySelector('#pageSelect .t-fake-arrow').classList.toggle("t-fake-arrow--active");
+    let display = document.querySelector('#pageSelect .t-popup').style.display
     if (display === 'none') {
-        document.querySelector('#tabSelect .t-popup').style.display = 'block'
+        document.querySelector('#pageSelect .t-popup').style.display = 'block'
     } else {
-        document.querySelector('#tabSelect .t-popup').style.display = 'none'
+        document.querySelector('#pageSelect .t-popup').style.display = 'none'
     }
 }
 
-function tabSelect() {
-    document.querySelector("#tabSelect").classList.toggle("t-select-input--popup-visible");
-    document.querySelector('#tabSelect .t-input__wrap').classList.toggle("t-popup-open");
-    document.querySelector('#tabSelect .t-input').classList.toggle("t-input--focused");
-    document.querySelector('#tabSelect .t-popup').classList.toggle("t-popup--animation-leave-to");
-    document.querySelector('#tabSelect .t-popup').classList.toggle("t-popup--animation-enter-to");
-    document.querySelector('#tabSelect .t-fake-arrow').classList.toggle("t-fake-arrow--active");
-    let display = document.querySelector('#tabSelect .t-popup').style.display
+function pageSelect() {
+    document.querySelector("#pageSelect").classList.toggle("t-select-input--popup-visible");
+    document.querySelector('#pageSelect .t-input__wrap').classList.toggle("t-popup-open");
+    document.querySelector('#pageSelect .t-input').classList.toggle("t-input--focused");
+    document.querySelector('#pageSelect .t-popup').classList.toggle("t-popup--animation-leave-to");
+    document.querySelector('#pageSelect .t-popup').classList.toggle("t-popup--animation-enter-to");
+    document.querySelector('#pageSelect .t-fake-arrow').classList.toggle("t-fake-arrow--active");
+    let display = document.querySelector('#pageSelect .t-popup').style.display
     if (display === 'none') {
-        document.querySelector('#tabSelect .t-popup').style.display = 'block'
+        document.querySelector('#pageSelect .t-popup').style.display = 'block'
     } else {
-        document.querySelector('#tabSelect .t-popup').style.display = 'none'
+        document.querySelector('#pageSelect .t-popup').style.display = 'none'
     }
 }

@@ -25,26 +25,94 @@ function padZero(num, targetLength = 2) {
   return str;
 }
 
+let timeEnd = null
+let pageData = null
 // UI 工具函数
-function showNotification(message, page) {
-  chrome.notifications.clear("定时提醒Event" + page);
-  // 以后在设置页设置这些
-  // eventTime 与通知关联的时间戳 Date.now() + n
-  // requireInteraction 通知应一直显示在屏幕上，直到用户激活或关闭通知
+async function showNotification(message, page) {
   // silent 静音 目前不好使，不能出声音，可能和电脑配置有关
-  chrome.notifications.create("定时提醒Event" + page, {
+  pageData = await timeManager.getPageData(page);
+  // 创建一个新窗口用于显示提醒
+  // const window = await chrome.windows.create({
+  //   url: `reminder.html?message=${message}`,
+  //   type: 'popup',
+  //   width: 450,
+  //   top: 200,
+  //   left: 400,
+  //   height: 240,
+  //   focused: true
+  // });
+  // console.log(window)
+  const notify = {
     type: "basic",
     iconUrl: "icons/icon128.png",
+    priority: 2,
     requireInteraction: true,
+    buttons: [
+      {
+        title: '我知道了'
+      }
+    ],
     title: message,
     message: "",
-  });
-  // 点击关闭 mac
-  chrome.notifications.onClicked.addListener(id => {
-    chrome.notifications.clear(id);
-  })
+  }
+  // 通知不一直显示
+  if (!pageData.check1) {
+    notify.requireInteraction = false
+  }
+  // 提醒一次
+  if (!pageData.radio1) {
+    notify.eventTime = Date.now() + Number(pageData.cdTime) * 1000
+  }
+  await timeManager.saveNotify(notify, `定时提醒Event${page}`)
+  await createNotify("定时提醒Event" + page, notify)
+  
+  if (timeEnd) clearTimeout(timeEnd)
+  if (pageData.check1 && pageData.radio1) {
+    timeEnd = setTimeout(() => {
+      setupAlarm()
+    }, 1000 * 20);
+  }
 }
 
+async function createNotify(k, notify) {
+  await chrome.notifications.clear(k);
+  await chrome.notifications.create(k, notify);
+}
+
+async function setupAlarm() {
+  const notifications = await chrome.notifications.getAll()
+  const keys = await timeManager.getNotifys()
+  let count = 0
+  keys.forEach(async k => {
+    if (notifications[k]) {
+      count++
+      const notify = await timeManager.getNotify(k)
+      await createNotify(k, notify)
+    } else {
+      await timeManager.saveNotify(null, k)
+    }
+  })
+  if (count && pageData.check1 && pageData.radio1) {
+    if (timeEnd) clearTimeout(timeEnd)
+    timeEnd = setTimeout(() => {
+      setupAlarm()
+    }, 1000 * 20);
+  }
+}
+
+// 点击关闭 mac
+chrome.notifications.onClicked.addListener(id => {
+  if (pageData.check2) {
+    chrome.notifications.clear(id);
+  }
+})
+chrome.notifications.onButtonClicked.addListener(id => {
+  chrome.notifications.clear(id);
+})
+// 不好使，估计edge浏览器的BUG
+chrome.notifications.onClosed.addListener(id => {
+  chrome.notifications.clear(id);
+});
 // 事件检查
 async function checkNextEvent(page) {
   const pageEvent = await timeManager.getPageEvent(page);
@@ -80,6 +148,7 @@ chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
     timeManager.start(message.page);
     return true;
   } else if (message.type === "TIME_PAUSE") {
+    clearTimeout(timeEnd)
     await timeManager.pause(message.page);
     return true;
   } else if (message.type === "ADD_EVENT") {
@@ -87,6 +156,7 @@ chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
     chrome.runtime.sendMessage({ type: "ADD_SUCCESS", page: message.page });
     return true;
   } else if (message.type === "DELETE_EVENT") {
+    clearTimeout(timeEnd)
     await timeManager.deleteEvent(message.page);
     return true;
   }
@@ -112,6 +182,31 @@ const timeManager = {
     const result = await chrome.storage.local.get([`timer_${page}`]);
     return result[`timer_${page}`];
   },
+  
+  async getNotify(key) {
+    const result = await chrome.storage.local.get([key]);
+    return result[key];
+  },
+  
+  async getNotifys() {
+    const keys = await chrome.storage.local.getKeys();
+    console.log(keys)
+    if (keys && keys.length > 0) {
+      return keys.filter(k => k.startsWith('定时提醒Event'))
+    }
+    return [];
+  },
+  
+  async getPageData(page) {
+      const result = await chrome.storage.local.get([`${page}_data`]);
+      return result[`${page}_data`] || {
+          cdTime: 10,
+          check1: true,
+          check2: true,
+          check3: false,
+          radio1: true
+      };
+  },
 
   async savePageEvent(pageEvent, page) {
     await chrome.storage.local.set({ [`page_event_${page}`]: pageEvent });
@@ -123,6 +218,10 @@ const timeManager = {
 
   async saveTimer(timer, page) {
     await chrome.storage.local.set({ [`timer_${page}`]: timer });
+  },
+
+  async saveNotify(notify, key) {
+    await chrome.storage.local.set({ [key]: notify });
   },
 
   async addEvent(name, date, page) {
@@ -261,17 +360,21 @@ const timeManager = {
   // 结束第一轮倒计时
   async end(page, remain) {
     await this.clearTimeout(page);
+    pageData = await timeManager.getPageData(page);
     const pageEvent = await this.getPageEvent(page);
     if (!pageEvent) return;
-    // 暂停
-    // filteredEvent.open = false
     pageEvent.milliseconds = 0;
     pageEvent.downTime = "00:00:00";
     await this.savePageEvent(pageEvent, page);
     // 暂停状态
     if (!pageEvent.open) return
     if (remain === 0) {
-      showNotification(pageEvent.name, page);
+      await showNotification(pageEvent.name, page);
+    }
+    if (!pageData.radio1) {
+      pageEvent.open = false
+      await this.savePageEvent(pageEvent, page);
+      return
     }
     this.startForPageEvent(pageEvent, page);
   },

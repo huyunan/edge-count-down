@@ -1,4 +1,4 @@
-// 当前 tab 页
+// 当前 page 页
 let tabPage = "page1";
 
 // 监听存储变化
@@ -149,15 +149,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 
-  // tab 页切换
+  // page 页切换
   document.getElementById("page1").addEventListener("click", async () => {
     await switchTab("page1");
   });
-  // tab 页切换
+  // page 页切换
   document.getElementById("page2").addEventListener("click", async () => {
     await switchTab("page2");
   });
-  // tab 页切换
+  // page 页切换
   document.getElementById("page3").addEventListener("click", async () => {
     await switchTab("page3");
   });

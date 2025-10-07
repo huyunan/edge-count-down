@@ -18,9 +18,9 @@
           <div class="trans-ctx--wrapper-config-panel">
             <div class="trans-ctx--title">扩展设置选项</div>
             <div class="trans-ctx--form-item">
-              <div class="trans-ctx--form-item-label">Tab页：</div>
+              <div class="trans-ctx--form-item-label">Page页：</div>
               <div class="t-select__wrap trans-ctx--selector-language">
-                <div class="t-select t-select-input" id="tabSelect">
+                <div class="t-select t-select-input" id="pageSelect">
                   <div class="t-input__wrap">
                     <div
                       class="t-input t-is-readonly t-size-m t-align-left t-is-default t-input--prefix t-input--suffix"
@@ -31,7 +31,7 @@
                         type="text"
                         class="t-input__inner"
                         readonly=""
-                        value="Tab1"
+                        value="page1"
                       /><span class="t-input__suffix t-input__suffix-icon"
                         ><svg
                           class="t-fake-arrow t-select__right-icon"
@@ -67,14 +67,14 @@
                         class="t-select__dropdown-inner t-select__dropdown-inner--size-m"
                       >
                         <ul class="t-select__list">
-                          <li class="t-select-option cd-select-tab1">
-                            <span>Tab1</span>
+                          <li class="t-select-option cd-select-page1">
+                            <span>page1</span>
                           </li>
-                          <li class="t-select-option cd-select-tab2">
-                            <span>Tab2</span>
+                          <li class="t-select-option cd-select-page2">
+                            <span>page2</span>
                           </li>
-                          <li class="t-select-option cd-select-tab3">
-                            <span>Tab3</span>
+                          <li class="t-select-option cd-select-page3">
+                            <span>page3</span>
                           </li>
                         </ul>
                       </div>
@@ -82,28 +82,11 @@
                   </div>
                 </div>
               </div>
-              <div class="trans-ctx--tip">保存对选中Tab的设置</div>
+              <div class="trans-ctx--tip">保存对选中Page的设置</div>
             </div>
             <div class="trans-ctx--form-item">
               <div class="trans-ctx--form-item-label">通知提醒选项：</div>
               <div>
-                <div class="t-input__wrap cd-input__label" value="Tab1">
-                  <span class="t-radio__label"
-                    ><span>提示停留时间（秒）：</span></span
-                  >
-                  <div
-                    class="t-input t-is-readonly t-size-m t-align-left t-is-default t-input--prefix t-input--suffix"
-                  >
-                    <div class="t-input__prefix"></div>
-                    <input
-                      id="cd-input-time"
-                      placeholder="请输入"
-                      type="number"
-                      class="t-input__inner cd-input__number"
-                      value=""
-                    />
-                  </div>
-                </div>
                 <label
                   id="cd-checkbox1"
                   class="t-checkbox cd-checkbox trans-ctx--transmart-crx-checkbox"
@@ -136,7 +119,7 @@
                     class="t-checkbox__former"
                     value=""
                   /><span class="t-checkbox__input"></span
-                  ><span class="t-checkbox__label">提醒声音</span></label
+                  ><span class="t-checkbox__label cd-bottom">提醒声音</span></label
                 >
                 <div class="trans-ctx--choose-words-options">
                   <div class="trans-ctx--transmart-crx-option-title">
@@ -162,6 +145,24 @@
                         ><span>提醒一次</span></span
                       ></label
                     >
+                  </div>
+                </div>
+                <div class="t-input__wrap cd-input__label" value="page1">
+                  <div class="trans-ctx--mask cd-time-mark cd-time-mark__exist"></div>
+                  <span class="t-radio__label"
+                    ><span>提示停留时间（秒）：</span></span
+                  >
+                  <div
+                    class="t-input t-is-readonly t-size-m t-align-left t-is-default t-input--prefix t-input--suffix"
+                  >
+                    <div class="t-input__prefix"></div>
+                    <input
+                      id="cd-input-time"
+                      placeholder="请输入"
+                      type="number"
+                      class="t-input__inner cd-input__number"
+                      value=""
+                    />
                   </div>
                 </div>
               </div>
