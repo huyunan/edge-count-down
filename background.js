@@ -25,12 +25,10 @@ function padZero(num, targetLength = 2) {
   return str;
 }
 
-let timeEnd = null
-let pageData = null
 // UI 工具函数
 async function showNotification(message, page) {
   // silent 静音 目前不好使，不能出声音，可能和电脑配置有关
-  pageData = await timeManager.getPageData(page);
+  const pageData = await timeManager.getPageData(page);
   // 创建一个新窗口用于显示提醒
   // const window = await chrome.windows.create({
   //   url: `reminder.html?message=${message}`,
@@ -41,7 +39,6 @@ async function showNotification(message, page) {
   //   height: 240,
   //   focused: true
   // });
-  // console.log(window)
   const notify = {
     type: "basic",
     iconUrl: "icons/icon128.png",
@@ -66,11 +63,12 @@ async function showNotification(message, page) {
   await timeManager.saveNotify(notify, `定时提醒Event${page}`)
   await createNotify("定时提醒Event" + page, notify)
   
-  if (timeEnd) clearTimeout(timeEnd)
+  await timeManager.clearTimeoutForLoop(page + '_loop');
   if (pageData.check1 && pageData.radio1) {
-    timeEnd = setTimeout(() => {
-      setupAlarm()
-    }, 1000 * 20);
+    const timeEnd = setTimeout(async () => {
+      await setupAlarm(page)
+    }, 1000 * 5);
+    await timeManager.saveTimer(timeEnd, page + '_loop');
   }
 }
 
@@ -79,39 +77,59 @@ async function createNotify(k, notify) {
   await chrome.notifications.create(k, notify);
 }
 
-async function setupAlarm() {
+async function setupAlarm(page) {
+  const pageData = await timeManager.getPageData(page);
   const notifications = await chrome.notifications.getAll()
-  const keys = await timeManager.getNotifys()
-  let count = 0
-  keys.forEach(async k => {
-    if (notifications[k]) {
-      count++
-      const notify = await timeManager.getNotify(k)
-      await createNotify(k, notify)
-    } else {
-      await timeManager.saveNotify(null, k)
+  const k = `定时提醒Event${page}`
+  if (notifications[k]) {
+    const notify = await timeManager.getNotify(k)
+    if (!notify) return
+    const data = await timeManager.getLoopTimes()
+    if (!data) return
+    if (!notifications['定时提醒Eventpage1']) data.page1 = 0
+    if (!notifications['定时提醒Eventpage2']) data.page2 = 0
+    if (!notifications['定时提醒Eventpage3']) data.page3 = 0
+    const times = data.page1 + data.page2 + data.page3
+    // 如果超过 4 分钟就不提醒了，防止阻止系统休眠
+    if (times > 12) {
+      await timeManager.clearTimeoutForLoop(page + '_loop');
+      return
     }
-  })
-  if (count && pageData.check1 && pageData.radio1) {
-    if (timeEnd) clearTimeout(timeEnd)
-    timeEnd = setTimeout(() => {
-      setupAlarm()
-    }, 1000 * 20);
+    await createNotify(k, notify)
+    await timeManager.saveNotify(notify, k)
+    data[page] += 1
+    await timeManager.saveLoopTimes(data, page)
+    if (pageData.check1 && pageData.radio1) {
+      await timeManager.clearTimeoutForLoop(page + '_loop');
+      const timeEnd = setTimeout(async () => {
+        await setupAlarm(page)
+      }, 1000 * 5);
+      await timeManager.saveTimer(timeEnd, page + '_loop');
+    }
+  } else {
+    await timeManager.saveNotify(null, k)
   }
 }
 
 // 点击关闭 mac
-chrome.notifications.onClicked.addListener(id => {
+chrome.notifications.onClicked.addListener(async id => {
+  const page = id.replace('定时提醒Event', '')
+  const pageData = await timeManager.getPageData(page);
   if (pageData.check2) {
     chrome.notifications.clear(id);
+    await timeManager.clearTimeoutForLoop(page + '_loop')
   }
 })
-chrome.notifications.onButtonClicked.addListener(id => {
+chrome.notifications.onButtonClicked.addListener(async id => {
+  const page = id.replace('定时提醒Event', '')
   chrome.notifications.clear(id);
+  await timeManager.clearTimeoutForLoop(page + '_loop')
 })
 // 不好使，估计edge浏览器的BUG
-chrome.notifications.onClosed.addListener(id => {
+chrome.notifications.onClosed.addListener(async id => {
+  const page = id.replace('定时提醒Event', '')
   chrome.notifications.clear(id);
+  await timeManager.clearTimeoutForLoop(page + '_loop')
 });
 // 事件检查
 async function checkNextEvent(page) {
@@ -148,7 +166,7 @@ chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
     timeManager.start(message.page);
     return true;
   } else if (message.type === "TIME_PAUSE") {
-    clearTimeout(timeEnd)
+    await timeManager.clearTimeoutForLoop(message.page + '_loop')
     await timeManager.pause(message.page);
     return true;
   } else if (message.type === "ADD_EVENT") {
@@ -156,7 +174,7 @@ chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
     chrome.runtime.sendMessage({ type: "ADD_SUCCESS", page: message.page });
     return true;
   } else if (message.type === "DELETE_EVENT") {
-    clearTimeout(timeEnd)
+    await timeManager.clearTimeoutForLoop(message.page + '_loop')
     await timeManager.deleteEvent(message.page);
     return true;
   }
@@ -188,13 +206,9 @@ const timeManager = {
     return result[key];
   },
   
-  async getNotifys() {
-    const keys = await chrome.storage.local.getKeys();
-    console.log(keys)
-    if (keys && keys.length > 0) {
-      return keys.filter(k => k.startsWith('定时提醒Event'))
-    }
-    return [];
+  async getLoopTimes() {
+    const result = await chrome.storage.local.get([`loop_times`]);
+    return result[`loop_times`];
   },
   
   async getPageData(page) {
@@ -222,6 +236,10 @@ const timeManager = {
 
   async saveNotify(notify, key) {
     await chrome.storage.local.set({ [key]: notify });
+  },
+
+  async saveLoopTimes(data, page) {
+    await chrome.storage.local.set({ [`loop_times_${page}`]: data });
   },
 
   async addEvent(name, date, page) {
@@ -259,6 +277,11 @@ const timeManager = {
     const timer = await this.getTimer(page);
     clearTimeout(timer);
     this.saveTimer(null, page);
+  },
+  
+  async clearTimeoutForLoop(page) {
+    const timer = await this.getTimer(page);
+    clearTimeout(timer);
   },
 
   // 开始倒计时
@@ -360,7 +383,7 @@ const timeManager = {
   // 结束第一轮倒计时
   async end(page, remain) {
     await this.clearTimeout(page);
-    pageData = await timeManager.getPageData(page);
+    const pageData = await timeManager.getPageData(page);
     const pageEvent = await this.getPageEvent(page);
     if (!pageEvent) return;
     pageEvent.milliseconds = 0;
